@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import { BrowserRouter, Switch, Redirect, Route } from "react-router-dom";
 import reportWebVitals from "./reportWebVitals";
 
+import "rc-slider/assets/index.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "./assets/styles/tailwind.css";
 import "./assets/styles/index.css";
