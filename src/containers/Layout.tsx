@@ -4,7 +4,7 @@ import React from "react";
 export const Layout: React.FC<{}> = ({ children }) => {
   return (
     <div className="w-screen h-screen">
-      <div className="p-4 pl-6 rounded bg-white shadow absolute top-4 left-4 z-50 flex">
+      <div className="p-4 pl-6 rounded bg-white shadow absolute top-4 left-4 z-40 flex">
         <div className="text-lg font-bold flex-1">Project GIS</div>
         <Popover className="relative">
           {({ open }) => (
@@ -71,7 +71,7 @@ export const Layout: React.FC<{}> = ({ children }) => {
                           target="_blank"
                           rel="noreferrer"
                         >
-                          https://www.google.com
+                          https://ourworldindata.org/us-states-vaccinations
                         </a>
                       </span>
                     </div>

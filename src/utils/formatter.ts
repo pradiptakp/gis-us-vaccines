@@ -1,14 +1,3 @@
-export const formatName = (name: string): string => {
-  const nameArr = name.split(" ");
-  let newName = "";
-
-  nameArr.forEach((v, i) => {
-    if (i < 2) {
-      newName += v + " ";
-    } else {
-      newName += v.charAt(0) + ". ";
-    }
-  });
-
-  return newName;
+export const numberWithCommas = (x: string) => {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
