@@ -32,7 +32,7 @@ export const Modal = ({
         <Transition appear show={isOpen} as={React.Fragment}>
           <Dialog
             as="div"
-            className="fixed inset-0 z-10 overflow-y-auto"
+            className="fixed inset-0 z-50 overflow-y-auto"
             onClose={() => {
               if (onClose) {
                 onClose();
@@ -70,7 +70,7 @@ export const Modal = ({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <div className="inline-block w-full max-w-4xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl max-h-screen">
+                <div className="inline-block w-full max-w-4xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
                   <Dialog.Title
                     as="h3"
                     className="text-lg font-medium leading-6 text-gray-900"

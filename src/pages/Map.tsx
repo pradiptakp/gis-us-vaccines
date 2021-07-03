@@ -79,6 +79,7 @@ const legendShare: [number, string][] = [
 export const MapPage = () => {
   const map = React.useRef<mapboxgl.Map>();
   const mapContainer = React.useRef<HTMLDivElement>(null);
+  const [loadingMap, setLoadingMap] = React.useState(true);
   const [currentDate, setCurrentDate] = React.useState(
     moment(todayDate).format("YYYY-MM-DD")
   );
@@ -202,10 +203,13 @@ export const MapPage = () => {
 
   React.useEffect(() => {
     if (currentDate && map.current && mapLoaded) {
+      setLoadingMap(true);
+
       //@ts-ignore
       (map.current.getSource("state") as any).setData(
         `http://127.0.0.1:5000/${selectedOptions.id}/${currentDate}`
       );
+      setLoadingMap(false);
     }
   }, [currentDate, selectedOptions]);
 
@@ -268,6 +272,7 @@ export const MapPage = () => {
         });
 
         setMapLoaded(true);
+        setLoadingMap(false);
 
         map.current.on("click", "state", function (e) {
           if (map.current) {
@@ -286,6 +291,14 @@ export const MapPage = () => {
 
   return (
     <div className="w-screen h-screen flex flex-col">
+      {loadingMap ? (
+        <div className="absolute top-2 inset-x-0 flex justify-center z-50">
+          <div className="p-2 bg-white rounded shadow flex items-center">
+            <HashLoader color="rgb(30, 64, 175)" size={16} />
+            <div className="ml-4 text-blueGray-600">Loading</div>
+          </div>
+        </div>
+      ) : null}
       <Modal
         open={modalContent ? true : false}
         title={modalContent?.stateName ?? ""}
