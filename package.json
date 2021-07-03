@@ -2,6 +2,7 @@
   "name": "project-gis",
   "version": "0.1.0",
   "private": true,
+  "homepage": ".",
   "dependencies": {
     "@craco/craco": "^6.1.2",
     "@esri/react-arcgis": "^5.1.0",
