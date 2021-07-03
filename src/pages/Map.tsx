@@ -6,6 +6,10 @@ import moment from "moment";
 import { numberWithCommas } from "../utils/formatter";
 import { Modal } from "../components/Modal";
 import { Popover, Transition } from "@headlessui/react";
+import { Line } from "react-chartjs-2";
+import axios from "axios";
+import DatePicker from "react-datepicker";
+import HashLoader from "react-spinners/ClipLoader";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoicHJhZGlwdGFrcCIsImEiOiJja3Bqc3liamswNjNoMnZwYmN0bzJxdjA2In0.Mjs-GkGZMsu8owYX_utitQ";
@@ -49,6 +53,7 @@ const options: optionType[] = [
 ];
 
 const legendTotal: [number, string][] = [
+  [0, "#FFF"],
   [500000, "#DEEBF7"],
   [1000000, "#C6DBEF"],
   [2500000, "#9ECAE1"],
@@ -60,6 +65,7 @@ const legendTotal: [number, string][] = [
 ];
 
 const legendShare: [number, string][] = [
+  [0, "#FFF"],
   [2, "#DEEBF7"],
   [5, "#C6DBEF"],
   [10, "#9ECAE1"],
@@ -80,8 +86,27 @@ export const MapPage = () => {
     moment("2021-01-13").diff(moment(todayDate), "days")
   );
 
+  const [chartData, setChartData] = React.useState<{
+    totalPeopleVaccinated: any[][];
+    sharePeopleVaccinated: any[][];
+    totalPeopleFullyVaccinated: any[][];
+    sharePeopleFullyVaccinated: any[][];
+  }>();
+
   const [modalContent, setModalContent] =
     React.useState<{ stateName: string; stateId: string }>();
+
+  const [predictDate, setPredictDate] = React.useState<Date>(
+    moment(todayDate).add(1, "days").toDate()
+  );
+
+  const [predictData, setPredictData] = React.useState<{
+    date: string;
+    predict: number;
+    state: string;
+    "total population": number;
+    "total vaccine": string;
+  }>();
 
   const [lng, setLng] = React.useState(-100);
   const [lat, setLat] = React.useState(35);
@@ -112,6 +137,54 @@ export const MapPage = () => {
       });
     }
   });
+
+  React.useEffect(() => {
+    if (!modalContent) {
+      setChartData(undefined);
+      return;
+    }
+    (async () => {
+      if (modalContent) {
+        setChartData(undefined);
+        const res1 = await axios.get<any[][]>(
+          `http://localhost:5000/total-people-vaccinated-in-state/${modalContent.stateName}`
+        );
+        const res2 = await axios.get<any[][]>(
+          `http://localhost:5000/share-people-vaccinated-in-state/${modalContent.stateName}`
+        );
+        const res3 = await axios.get<any[][]>(
+          `http://localhost:5000/total-people-fully-vaccinated-in-state/${modalContent.stateName}`
+        );
+        const res4 = await axios.get<any[][]>(
+          `http://localhost:5000/share-people-fully-vaccinated-in-state/${modalContent.stateName}`
+        );
+
+        setChartData({
+          totalPeopleVaccinated: res1.data,
+          sharePeopleVaccinated: res2.data,
+          totalPeopleFullyVaccinated: res3.data,
+          sharePeopleFullyVaccinated: res4.data,
+        });
+      }
+    })();
+  }, [modalContent]);
+
+  React.useEffect(() => {
+    if (!predictDate) {
+      setPredictData(undefined);
+      return;
+    }
+    (async () => {
+      setPredictData(undefined);
+      if (predictDate && modalContent) {
+        const res = await axios.get<any>(
+          `http://localhost:5000/predict-vaccine-total-next-date/${modalContent.stateName}/${currentDate}`
+        );
+
+        setPredictData(res.data);
+      }
+    })();
+  }, [predictDate, modalContent]);
 
   React.useEffect(() => {
     if (!map.current) {
@@ -198,7 +271,6 @@ export const MapPage = () => {
 
         map.current.on("click", "state", function (e) {
           if (map.current) {
-            console.log(selectedOptionsRef.current);
             setModalContent({
               stateName: (e as any).features[0].properties.STATE_NAME as string,
               stateId: (e as any).features[0].properties[
@@ -217,7 +289,216 @@ export const MapPage = () => {
       <Modal
         open={modalContent ? true : false}
         title={modalContent?.stateName ?? ""}
-        content={<div>{modalContent?.stateId}</div>}
+        content={
+          <div>
+            <div className="mb-16">
+              <div className="text-md font-medium leading-6 text-gray-900 mb-4">
+                Predict Total of People Fully Vaccinated
+              </div>
+              <DatePicker
+                autoFocus={false}
+                customInput={
+                  <div className="inline-flex justify-center px-4 py-2 text-sm font-medium text-blue-900 bg-blue-100 border border-transparent rounded-md hover:bg-blue-200 focus:outline-none cursor-pointer">
+                    {moment(predictDate).format("DD MMMM YYYY")}
+                  </div>
+                }
+                selected={predictDate}
+                onChange={(date) => setPredictDate(date as Date)}
+                minDate={moment(todayDate).add(1, "days").toDate()}
+              />
+
+              {predictData ? (
+                <div className="p-6 bg-blue-50 rounded-md mt-2">
+                  <div className="flex">
+                    <div className="flex-1">
+                      <div className="text-xs text-blueGray-600 font-medium">
+                        Predicted Number of People Fully Vaccinated
+                      </div>
+                      <div>
+                        {numberWithCommas(predictData["predict"].toString())}
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-xs text-blueGray-600 font-medium">
+                        Compared to Population
+                      </div>
+                      <div>
+                        {numberWithCommas(
+                          predictData["total vaccine"].toString()
+                        )}{" "}
+                        (Out of{" "}
+                        {numberWithCommas(
+                          predictData["total population"].toString()
+                        )}
+                        )
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="h-10 flex justify-center items-center">
+                  <HashLoader color="rgb(30, 64, 175)" size={12} />
+                </div>
+              )}
+            </div>
+
+            {chartData ? (
+              <>
+                <div className="flex space-x-8 mb-12">
+                  <div className="flex-1">
+                    <div className="text-md font-medium leading-6 text-gray-900 mb-4">
+                      Total People Vaccinated (1 Dose)
+                    </div>
+
+                    <Line
+                      data={{
+                        labels: chartData?.totalPeopleVaccinated.map(
+                          (v) => v[1]
+                        ),
+                        datasets: [
+                          {
+                            label: "Total People Vaccinated (1 Dose)",
+                            data: chartData?.totalPeopleVaccinated.map(
+                              (v) => v[2]
+                            ),
+                            fill: false,
+                            backgroundColor: "#2171B5",
+                            borderColor: "#2171B5",
+                          },
+                        ],
+                      }}
+                      options={{
+                        scales: {
+                          yAxes: [
+                            {
+                              ticks: {
+                                beginAtZero: true,
+                              },
+                            },
+                          ],
+                        },
+                      }}
+                      type="line"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-md font-medium leading-6 text-gray-900 mb-4">
+                      Share People Vaccinated in % (1 Dose)
+                    </div>
+                    <Line
+                      data={{
+                        labels: chartData?.sharePeopleVaccinated.map(
+                          (v) => v[1]
+                        ),
+                        datasets: [
+                          {
+                            label:
+                              "Share People Vaccinated In Percent (1 Dose)",
+                            data: chartData?.sharePeopleVaccinated.map(
+                              (v) => v[2]
+                            ),
+                            fill: false,
+                            backgroundColor: "#2171B5",
+                            borderColor: "#2171B5",
+                          },
+                        ],
+                      }}
+                      options={{
+                        scales: {
+                          yAxes: [
+                            {
+                              ticks: {
+                                beginAtZero: true,
+                              },
+                            },
+                          ],
+                        },
+                      }}
+                      type="line"
+                    />
+                  </div>
+                </div>
+                <div className="flex space-x-6">
+                  <div className="flex-1">
+                    <div className="text-md font-medium leading-6 text-gray-900 mb-4">
+                      Total People Fully Vaccinated
+                    </div>
+
+                    <Line
+                      data={{
+                        labels: chartData?.totalPeopleFullyVaccinated.map(
+                          (v) => v[1]
+                        ),
+                        datasets: [
+                          {
+                            label: "Total People Fully Vaccinated",
+                            data: chartData?.totalPeopleFullyVaccinated.map(
+                              (v) => v[2]
+                            ),
+                            fill: false,
+                            backgroundColor: "#2171B5",
+                            borderColor: "#2171B5",
+                          },
+                        ],
+                      }}
+                      options={{
+                        scales: {
+                          yAxes: [
+                            {
+                              ticks: {
+                                beginAtZero: true,
+                              },
+                            },
+                          ],
+                        },
+                      }}
+                      type="line"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-md font-medium leading-6 text-gray-900 mb-4">
+                      Share People Fully Vaccinated In %
+                    </div>
+                    <Line
+                      data={{
+                        labels: chartData?.sharePeopleFullyVaccinated.map(
+                          (v) => v[1]
+                        ),
+                        datasets: [
+                          {
+                            label: "Share People Fully Vaccinated In Percent",
+                            data: chartData?.sharePeopleFullyVaccinated.map(
+                              (v) => v[2]
+                            ),
+                            fill: false,
+                            backgroundColor: "#2171B5",
+                            borderColor: "#2171B5",
+                          },
+                        ],
+                      }}
+                      options={{
+                        scales: {
+                          yAxes: [
+                            {
+                              ticks: {
+                                beginAtZero: true,
+                              },
+                            },
+                          ],
+                        },
+                      }}
+                      type="line"
+                    />
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="h-10 flex justify-center items-center">
+                <HashLoader color="rgb(30, 64, 175)" size={12} />
+              </div>
+            )}
+          </div>
+        }
         buttons={[{ text: "OK" }]}
         onClose={() => {
           setModalContent(undefined);
@@ -330,7 +611,7 @@ export const MapPage = () => {
                 leaveFrom="opacity-100 translate-y-0"
                 leaveTo="opacity-0 translate-y-1"
               >
-                <Popover.Panel className="absolute z-50 w-80 px-4 mb-2 transform bottom-16 right-2 sm:px-0 lg:max-w-3xl">
+                <Popover.Panel className="absolute z-50 w-80 px-4 mb-2 transform bottom-20 right-2 sm:px-0 lg:max-w-3xl">
                   <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 bg-white ">
                     {options.map((v) => (
                       <div

@@ -30,7 +30,7 @@ export const Layout: React.FC<{}> = ({ children }) => {
               >
                 <Popover.Panel className="absolute z-10 w-screen max-w-xs px-4 mt-6 transform -translate-x-2.5 -left-28 sm:px-0">
                   <div className="overflow-hidden rounded shadow-lg ring-1 ring-black ring-opacity-5">
-                    <div className="p-6 bg-gray-50">
+                    <div className="p-6 bg-white">
                       <span className="flex items-center mb-2">
                         <span className="font-bold uppercase tracking-widest text-xs text-blue-600">
                           Kelompok
@@ -67,7 +67,7 @@ export const Layout: React.FC<{}> = ({ children }) => {
                       </span>
                       <span className="block text-sm text-blue-500 flex-1">
                         <a
-                          href="http://www.google.com"
+                          href="https://ourworldindata.org/us-states-vaccinations"
                           target="_blank"
                           rel="noreferrer"
                         >

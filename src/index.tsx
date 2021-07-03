@@ -10,6 +10,7 @@ import "./assets/styles/index.css";
 import "./assets/styles/nprogress.css";
 import "react-toastify/dist/ReactToastify.min.css";
 import "mapbox-gl/dist/mapbox-gl.css";
+import "react-datepicker/dist/react-datepicker.css";
 import { ToastContainer, Slide } from "react-toastify";
 
 import { MapPage } from "./pages/Map";
