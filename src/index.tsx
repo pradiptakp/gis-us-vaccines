@@ -43,8 +43,8 @@ export const App = () => {
     <BrowserRouter>
       <Layout>
         <Switch>
-          <Route exact path="/" component={MapPage} />
-          <Redirect to="/" />
+          <Route exact path="/project-gis" component={MapPage} />
+          <Redirect to="/project-gis" />
         </Switch>
       </Layout>
       <ToastContainer
