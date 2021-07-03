@@ -1,8 +1,8 @@
 # Project GIS
 
-- Dea Niar Misdayuni - 21101710XX
-- Risky Alamsyah Legowo - 21101710XX
-- Angga Pradipta K. P. - 21101710XX
+- Dea Niar Misdayuni - 2110171037
+- Risky Alamsyah Legowo - 2110171044
+- Angga Pradipta K. P. - 2110171048
 
 ### How to Run
 

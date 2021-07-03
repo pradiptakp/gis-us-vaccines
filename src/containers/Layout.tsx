@@ -41,7 +41,7 @@ export const Layout: React.FC<{}> = ({ children }) => {
                           Dea Niar M.
                         </span>
                         <span className="block text-sm text-gray-500">
-                          21101710XX
+                          2110171037
                         </span>
                       </div>
                       <div className="flex">
@@ -49,7 +49,7 @@ export const Layout: React.FC<{}> = ({ children }) => {
                           Risky Alamsyah L.
                         </span>
                         <span className="block text-sm text-gray-500">
-                          21101710XX
+                          2110171044
                         </span>
                       </div>
                       <div className="flex mb-6">
