@@ -180,7 +180,9 @@ export const MapPage = () => {
       setPredictData(undefined);
       if (predictDate && modalContent) {
         const res = await axios.get<any>(
-          `${apiUrl}/predict-vaccine-total-next-date/${modalContent.stateName}/${predictDate}`
+          `${apiUrl}/predict-vaccine-total-next-date/${
+            modalContent.stateName
+          }/${moment(predictDate).format("YYYY-MM-DD")}`
         );
 
         setPredictData(res.data);
