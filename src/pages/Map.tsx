@@ -10,6 +10,7 @@ import { Line } from "react-chartjs-2";
 import axios from "axios";
 import DatePicker from "react-datepicker";
 import HashLoader from "react-spinners/ClipLoader";
+import { apiUrl } from "../apis";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoicHJhZGlwdGFrcCIsImEiOiJja3Bqc3liamswNjNoMnZwYmN0bzJxdjA2In0.Mjs-GkGZMsu8owYX_utitQ";
@@ -148,16 +149,16 @@ export const MapPage = () => {
       if (modalContent) {
         setChartData(undefined);
         const res1 = await axios.get<any[][]>(
-          `http://localhost:5000/total-people-vaccinated-in-state/${modalContent.stateName}`
+          `${apiUrl}/total-people-vaccinated-in-state/${modalContent.stateName}`
         );
         const res2 = await axios.get<any[][]>(
-          `http://localhost:5000/share-people-vaccinated-in-state/${modalContent.stateName}`
+          `${apiUrl}/share-people-vaccinated-in-state/${modalContent.stateName}`
         );
         const res3 = await axios.get<any[][]>(
-          `http://localhost:5000/total-people-fully-vaccinated-in-state/${modalContent.stateName}`
+          `${apiUrl}/total-people-fully-vaccinated-in-state/${modalContent.stateName}`
         );
         const res4 = await axios.get<any[][]>(
-          `http://localhost:5000/share-people-fully-vaccinated-in-state/${modalContent.stateName}`
+          `${apiUrl}/share-people-fully-vaccinated-in-state/${modalContent.stateName}`
         );
 
         setChartData({
@@ -179,7 +180,7 @@ export const MapPage = () => {
       setPredictData(undefined);
       if (predictDate && modalContent) {
         const res = await axios.get<any>(
-          `http://localhost:5000/predict-vaccine-total-next-date/${modalContent.stateName}/${currentDate}`
+          `${apiUrl}/predict-vaccine-total-next-date/${modalContent.stateName}/${currentDate}`
         );
 
         setPredictData(res.data);
@@ -207,7 +208,7 @@ export const MapPage = () => {
 
       //@ts-ignore
       (map.current.getSource("state") as any).setData(
-        `http://127.0.0.1:5000/${selectedOptions.id}/${currentDate}`
+        `${apiUrl}/${selectedOptions.id}/${currentDate}`
       );
       setLoadingMap(false);
     }
@@ -229,7 +230,7 @@ export const MapPage = () => {
       if (map.current && map.current.isStyleLoaded()) {
         map.current.addSource("state", {
           type: "geojson",
-          data: `http://127.0.0.1:5000/${selectedOptionsRef.current?.id}/${currentDate}`,
+          data: `${apiUrl}/${selectedOptionsRef.current?.id}/${currentDate}`,
         });
 
         // Add a new layer to visualize the polygon.
